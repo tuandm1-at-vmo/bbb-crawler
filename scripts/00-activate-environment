@@ -1,0 +1,20 @@
+#!/bin/bash
+
+export VIRTUALENV_DIR=venv
+export PYTHON_VERSION="3.7"
+export AIRFLOW_VERSION="2.6.3"
+export AIRFLOW_ADMIN_USERNAME=airflow
+export AIRFLOW_ADMIN_PASSWORD=airflow
+export AIRFLOW_ADMIN_EMAIL=airflow@example.com
+export AIRFLOW_ADMIN_FIRSTNAME=airflow
+export AIRFLOW_ADMIN_LASTNAME=airflow
+export AIRFLOW_WEB_PORT=8081
+
+#rm -rf $VIRTUALENV_DIR
+
+if [ ! -z "$(which virtualenv)" ]; then
+    virtualenv $VIRTUALENV_DIR
+    source $VIRTUALENV_DIR/bin/activate
+else
+    echo "You must install virtualenv before running this script."
+fi

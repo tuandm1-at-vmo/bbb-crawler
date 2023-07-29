@@ -1,0 +1,4 @@
+#!/bin/bash
+
+rm -rf logs
+docker cp airflow_scheduler:/opt/airflow/logs logs

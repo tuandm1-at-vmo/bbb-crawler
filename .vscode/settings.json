@@ -1,0 +1,10 @@
+{
+    "python.autoComplete.extraPaths": [
+        "${workspaceFolder}/venv/lib/python3.7/site-packages"
+    ],
+    "python.analysis.extraPaths": [
+        "${workspaceFolder}/venv/lib/python3.7/site-packages"
+    ],
+    "python.envFile": "${workspaceFolder}/.env",
+    "python.analysis.typeCheckingMode": "basic"
+}

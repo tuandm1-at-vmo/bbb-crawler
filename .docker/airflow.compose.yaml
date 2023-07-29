@@ -1,0 +1,66 @@
+version: '3'
+x-airflow-common: &airflow-common
+  image: apache/airflow:$AIRFLOW_VERSION
+  environment:
+    - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+    - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://postgres:postgres@postgres:5432/airflow
+    - AIRFLOW__CORE__FERNET_KEY=FB0o_zt4e3Ziq3LdUUO7F2Z95cvFFx16hU8jTeR1ASM=
+    - AIRFLOW__CORE__LOAD_EXAMPLES=False
+    - AIRFLOW__CORE__LOGGING_LEVEL=INFO
+    - AIRFLOW__CORE__MAX_MAP_LENGTH=1000000
+  volumes:
+    - ./$PYTHON_SITE:/home/airflow/.local/lib/python$PYTHON_VERSION/site-packages
+    - ./src:/opt/airflow/dags
+    # - ./airflow-data/logs:/opt/airflow/logs
+    # - ./airflow-data/plugins:/opt/airflow/plugins
+    # - ./airflow-data/airflow.cfg:/opt/airflow/airflow.cfg
+  depends_on:
+    - postgres
+  networks:
+    - airflow
+
+services:
+  postgres:
+    image: postgres:15.3
+    container_name: airflow_postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=airflow
+      - POSTGRES_PORT=5432
+    restart: always
+    networks:
+      - airflow
+  airflow-init:
+    << : *airflow-common
+    container_name: airflow_init
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - |
+        airflow db init && \
+        airflow users create \
+        --role Admin \
+        --username $AIRFLOW_ADMIN_USERNAME \
+        --password $AIRFLOW_ADMIN_PASSWORD \
+        --email $AIRFLOW_ADMIN_EMAIL \
+        --firstname $AIRFLOW_ADMIN_FIRSTNAME \
+        --lastname $AIRFLOW_ADMIN_LASTNAME
+    restart: on-failure
+  airflow-webserver:
+    << : *airflow-common
+    command: airflow webserver
+    container_name: airflow_webserver
+    ports:
+      - $AIRFLOW_WEB_PORT:8080
+    restart: always
+  airflow-scheduler:
+    << : *airflow-common
+    command: airflow scheduler
+    container_name: airflow_scheduler
+    restart: always
+
+networks:
+  airflow:
+    name: airflow
+    external: true

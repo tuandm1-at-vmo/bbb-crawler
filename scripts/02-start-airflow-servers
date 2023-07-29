@@ -1,0 +1,6 @@
+#!/bin/bash
+
+export PYTHON_SITE=$VIRTUALENV_DIR/lib/python$PYTHON_VERSION/site-packages
+
+docker network create airflow || true
+docker compose --project-directory . -f .docker/airflow.compose.yaml up -d

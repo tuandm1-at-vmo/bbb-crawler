@@ -1,0 +1,4 @@
+#!/bin/bash
+
+docker network create airflow || true
+docker compose --project-directory . -f .docker/mongo.compose.yaml up -d

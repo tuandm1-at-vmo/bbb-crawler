@@ -1,0 +1,11 @@
+#!/bin/bash
+
+export MONGO_USERNAME=admin
+export MONGO_PASSWORD=admin
+export AIRFLOW_MONGO_CONNECTION_ID=mongo_bbb
+
+docker exec -it airflow_scheduler bash -c " \
+    airflow connections add \
+        --conn-uri "mongo://$MONGO_USERNAME:$MONGO_PASSWORD@mongo:27017" \
+        $AIRFLOW_MONGO_CONNECTION_ID \
+"
