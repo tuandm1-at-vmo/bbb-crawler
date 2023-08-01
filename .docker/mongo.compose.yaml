@@ -1,7 +1,7 @@
 services:
   mongo:
     image: mongo
-    container_name: mongo-crawler
+    container_name: airflow_mongo
     ports:
       - 27017:27017
     environment:
