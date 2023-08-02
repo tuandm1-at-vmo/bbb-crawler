@@ -35,6 +35,16 @@ def get_bike_details(model_id: str):
     raise error_response(res)
 
 
+def get_bike_product_page(product_url: str):
+    ''' Get raw page content of a specific bike model. '''
+    url = f'{TREKBIKES_BASE_URL}{product_url}'
+    headers = MOZILLA_HEADERS
+    res = requests.get(url=url, headers=headers)
+    if res.status_code == 200:
+        return res.text
+    raise error_response(res)
+
+
 def get_bike_spec(spec_id: str):
     ''' Fetch information for a specific bike spec. '''
     url = f'{TREKBIKES_BASE_URL}/product/spec/{spec_id}'

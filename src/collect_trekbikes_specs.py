@@ -64,10 +64,10 @@ def save_bike_spec_details(spec_details, **context):
     start_date=datetime(2023, 1, 1),
     catchup=False,
     params={
-        f'{CONNECTION_ID}': 'mongo_bbb',
-        f'{DATABASE_NAME}': 'bbb-dev',
-        f'{SOURCE_COLLECTION_PARAM}': 'bikes',
-        f'{TARGET_COLLECTION_PARAM}': 'bike_specs',
+        f'{CONNECTION_ID}': 'mongo_default',
+        f'{DATABASE_NAME}': 'test',
+        f'{SOURCE_COLLECTION_PARAM}': 'trekbikes',
+        f'{TARGET_COLLECTION_PARAM}': 'trekbike_specs',
         f'{TARGET_YEAR_PARAM}': '2024',
     },
 )

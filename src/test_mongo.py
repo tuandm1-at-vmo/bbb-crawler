@@ -10,6 +10,7 @@ def list_colls(**context):
     db = mongo.db_from_params(**context)
     colls = db.list_collection_names()
     print(f'test ping db: {colls}')
+    return colls
 
 
 @dag(
@@ -17,8 +18,8 @@ def list_colls(**context):
     start_date=datetime(2023, 1, 1),
     catchup=False,
     params={
-        f'{CONNECTION_ID}': 'mongo_bbb',
-        f'{DATABASE_NAME}': 'bbb-dev',
+        f'{CONNECTION_ID}': 'mongo_default',
+        f'{DATABASE_NAME}': 'test'  ,
     },
 )
 def test_mongo():

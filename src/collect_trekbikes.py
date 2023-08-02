@@ -1,5 +1,7 @@
 from airflow.decorators import dag, task
+from bs4 import BeautifulSoup, Tag
 from datetime import datetime
+import json
 
 from constants.airflow import CONNECTION_ID, DATABASE_NAME
 import services.mongo as mongo
@@ -26,6 +28,7 @@ def save_bike_url(bike_metadata, **context):
         coll_name = get_context_params(TARGET_COLLECTION_PARAM, **context)
         coll = db.get_collection(coll_name)
         bike_id = str(bike_metadata['id'])
+        bike_url = str(bike_metadata['productUrl'])
         filter = { 'id': bike_id }
         update = {
             **bike_metadata,
@@ -34,17 +37,38 @@ def save_bike_url(bike_metadata, **context):
         existed = coll.find_one(filter)
         if existed is None:
             coll.insert_one(update)
-            return bike_id
+            return {
+                'id': bike_id,
+                'url': bike_url,
+            }
         elif existed['details'] is None:
-            return bike_id
+            return {
+                'id': bike_id,
+                'url': bike_url,
+            }
     except Exception as ex:
         print(f'error: {ex}')
 
 
 @task()
-def get_bike_details(bike_id):
+def get_bike_details(bike_header):
+    bike_id = bike_header['id']
+    bike_url = bike_header['url']
     if bike_id is None: return
-    return trekbikes.get_bike_details(model_id=bike_id)
+    details = trekbikes.get_bike_details(model_id=bike_id)
+    if bike_url is not None:
+        product_content = trekbikes.get_bike_product_page(product_url=bike_url)
+        details['productContent'] = product_content
+        soup = BeautifulSoup(markup=product_content, features='html.parser')
+        container = soup.find('bike-overview-container', {
+            ':product-data': True,
+        })
+        if isinstance(container, Tag):
+            product_data = json.loads(str(container.get(':product-data')))
+            description = product_data['copyPositioningStatement']
+            details['productData'] = product_data
+            details['description'] = description
+    return details
 
 
 @task()
@@ -73,16 +97,16 @@ def save_bike_details(bike_details, **context):
     start_date=datetime(2023, 1, 1),
     catchup=False,
     params={
-        f'{CONNECTION_ID}': 'mongo_bbb',
-        f'{DATABASE_NAME}': 'bbb-dev',
-        f'{TARGET_COLLECTION_PARAM}': 'bikes',
+        f'{CONNECTION_ID}': 'mongo_default',
+        f'{DATABASE_NAME}': 'test',
+        f'{TARGET_COLLECTION_PARAM}': 'trekbikes',
         f'{TARGET_YEAR_PARAM}': '2024',
     },
 )
 def collect_trekbikes():
     metadata = get_bike_list()
     inserted = save_bike_url.expand(bike_metadata=metadata)
-    details = get_bike_details.expand(bike_id=inserted)
+    details = get_bike_details.expand(bike_header=inserted)
     save_bike_details.expand(bike_details=details)
 
 
