@@ -60,25 +60,35 @@ def get_bike_details(bike_header):
     bike_url = bike_header['url']
     if bike_id is None: return
     details = trekbikes.get_bike_details(model_id=bike_id)
+    default_product_code = None
+    try:
+        if details['categorizationHierarchyValues'] is not None and isinstance(details['categorizationHierarchyValues'], list):
+            default_product_code = list(details['categorizationHierarchyValues'])[0]['options']['productCode']
+            details['defaultProductCode'] = default_product_code
+    except:
+        print(f'error: {bike_id} does not contain categorizationHierarchyValues')
+    default_images: set[str] = set()
     if details['images'] is not None and isinstance(details['images'], dict):
         images = dict(details['images'])
         for color in images:
             assets = images[color]
             if not isinstance(assets, list) or len(assets) == 0: continue
-            default_asset_id = str(assets[0]['assetId'])
             for asset in assets:
                 asset_id = str(asset['assetId'])
-                if asset_id.lower().endswith('portrait'):
-                    default_asset_id = asset_id
+                asset_variant_list: set[str] = set(asset['variantList'])
+                if default_product_code in asset_variant_list:
+                    default_images.add(trekbikes.get_bike_image_url(asset_id))
+        details['defaultImages'] = list(default_images)
+        if len(default_images) > 0:
+            details['defaultImage'] = list(default_images)[0]
+            for image in default_images:
+                if image.lower().endswith('portrait'):
+                    details['defaultImage'] = image
                     break
-            if default_asset_id is not None:
-                details['defaultImage'] = trekbikes.get_bike_image_url(default_asset_id)
-                break
     if bike_url is not None:
         categories = [re.sub(r'-', ' ', c).title() for c in str(bike_url).split('/')[2:4]]
         details['categories'] = categories
         product_content = trekbikes.get_bike_product_page(product_url=bike_url)
-        # details['productContent'] = product_content
         soup = BeautifulSoup(markup=product_content, features='html.parser')
         container = soup.find('bike-overview-container', {
             ':product-data': True,
@@ -86,7 +96,6 @@ def get_bike_details(bike_header):
         if isinstance(container, Tag):
             product_data = json.loads(str(container.get(':product-data')))
             description = product_data['copyPositioningStatement']
-            details['productData'] = product_data
             details['description'] = description
         reviews = soup.find('product-reviews-header', {
             ':options': True,
@@ -150,6 +159,7 @@ def save_bike_technical_data(bike_technical_data, **context):
         coll.update_one(filter=filter, update=update)
     except Exception as ex:
         print(f'error: {ex}')
+
 
 @dag(
     schedule_interval='@daily',
