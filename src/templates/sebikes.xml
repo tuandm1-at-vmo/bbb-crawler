@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Products xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<Product>
+		<modelSku>{{sku}}</modelSku>
+		<modelName>{{model}}</modelName>
+		<modelYear>{{year}}</modelYear>
+		<modelDescription>
+			<![CDATA[{{description}}]]>
+		</modelDescription>
+		<gender>{{gender}}</gender>
+		<Brand>
+			<name>{{brand}}</name>
+		</Brand>
+		<Specs>
+			<Spec>
+				<name>{{spec.key}}</name>
+				<value>{{spec.value}}</value>
+			</Spec>
+		</Specs>
+		<Categories>
+			<Category>
+				<ID>0</ID>
+			</Category>
+		</Categories>
+		<ModelImages>
+			<ModelImage>
+				<micro url="https://www.sefiles.net/images/library/micro/specialized-roll-elite-349824-1.jpg">https://www.sefiles.net/images/library/micro/specialized-roll-elite-349824-1.jpg</micro>
+				<small url="https://www.sefiles.net/images/library/small/specialized-roll-elite-349824-1.jpg">https://www.sefiles.net/images/library/small/specialized-roll-elite-349824-1.jpg</small>
+				<large url="https://www.sefiles.net/images/library/large/specialized-roll-elite-349824-1.jpg">https://www.sefiles.net/images/library/large/specialized-roll-elite-349824-1.jpg</large>
+				<zoom url="https://www.sefiles.net/images/library/zoom/specialized-roll-elite-349824-1.jpg">https://www.sefiles.net/images/library/zoom/specialized-roll-elite-349824-1.jpg</zoom>
+				<sortOrder>0</sortOrder>
+			</ModelImage>
+		</ModelImages>
+		<VariationCombinations>
+			<VariationCombination>
+				<gtin1>{{gtin}}</gtin1>
+				<msrp>{{msrp}}</msrp>
+				<length>{{length}}</length>
+				<width>{{width}}</width>
+				<height>{{height}}</height>
+				<weight>{{weight}}</weight>
+			</VariationCombination>
+		</VariationCombinations>
+	</Product>
+</Products>
