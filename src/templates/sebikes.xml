@@ -41,5 +41,8 @@
 				<weight>{{weight}}</weight>
 			</VariationCombination>
 		</VariationCombinations>
+		<bbb>
+			<DefaultImage>https://www.sefiles.net/images/library/zoom/specialized-roll-elite-349824-1.jpg</DefaultImage>
+		</bbb>
 	</Product>
 </Products>

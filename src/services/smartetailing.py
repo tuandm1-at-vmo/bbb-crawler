@@ -21,6 +21,7 @@ def create_product_xml_element(
         height: Union[float, str, None],
         weight: Union[float, str, None],
         images: Union[List[str], None],
+        default_image: Union[str, None],
         spec_items: Union[Dict[str, str], None],):
     if msrp is None: msrp = ''
     if gtin is None: gtin = ''
@@ -28,10 +29,11 @@ def create_product_xml_element(
     if width is None: width = ''
     if height is None: height = ''
     if weight is None: weight = ''
+    if default_image is None: default_image = ''
     brand = escape_special_characters(brand)
     model = escape_special_characters(model)
     description = escape_special_characters(description)
-    return f'''<Product><modelSku>{sku}</modelSku><modelName>{model}</modelName><modelYear>{year}</modelYear><modelDescription><![CDATA[{description}]]></modelDescription><gender>{get_gender(genders=genders)}</gender><Brand><name>{brand}</name></Brand><Specs>{create_specs_xml_element(spec_items=spec_items)}</Specs><Categories><Category><ID>0</ID></Category></Categories><ModelImages>{create_images_xml_element(images=images)}</ModelImages><VariationCombinations><VariationCombination><mpn/><gtin1>{gtin}</gtin1><msrp>{msrp}</msrp><length>{length}</length><width>{width}</width><height>{height}</height><weight>{weight}</weight></VariationCombination></VariationCombinations></Product>'''
+    return f'''<Product><modelSku>{sku}</modelSku><modelName>{model}</modelName><modelYear>{year}</modelYear><modelDescription><![CDATA[{description}]]></modelDescription><gender>{get_gender(genders=genders)}</gender><Brand><name>{brand}</name></Brand><Specs>{create_specs_xml_element(spec_items=spec_items)}</Specs><Categories><Category><ID>0</ID></Category></Categories><ModelImages>{create_images_xml_element(images=images)}</ModelImages><VariationCombinations><VariationCombination><mpn/><gtin1>{gtin}</gtin1><msrp>{msrp}</msrp><length>{length}</length><width>{width}</width><height>{height}</height><weight>{weight}</weight></VariationCombination></VariationCombinations><bbb><DefaultImage>{default_image}</DefaultImage></bbb></Product>'''
 
 
 def get_gender(genders: Union[List[str], None]):
