@@ -32,6 +32,7 @@ def chop_sebikes_to_bulk(sebikes: list, bulk_size = 1):
             gtin=safe_get(sebike, 'gtin'),
             images=safe_get(sebike, 'images'),
             default_image=safe_get(sebike, 'defaultImage'),
+            categories=safe_get(sebike, 'categories'),
             spec_items=safe_get(sebike, 'specItems'),
             length=None,
             width=None,

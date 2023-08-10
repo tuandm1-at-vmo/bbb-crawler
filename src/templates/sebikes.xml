@@ -13,13 +13,14 @@
 		</Brand>
 		<Specs>
 			<Spec>
-				<name>{{spec.key}}</name>
+				<name>{{spec.name}}</name>
 				<value>{{spec.value}}</value>
 			</Spec>
 		</Specs>
 		<Categories>
 			<Category>
 				<ID>0</ID>
+				<name>{{category.name}}</name>
 			</Category>
 		</Categories>
 		<ModelImages>

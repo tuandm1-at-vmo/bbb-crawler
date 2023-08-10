@@ -22,7 +22,8 @@ def create_product_xml_element(
         weight: Union[float, str, None],
         images: Union[List[str], None],
         default_image: Union[str, None],
-        spec_items: Union[Dict[str, str], None],):
+        categories: Union[List[str], None],
+        spec_items: Union[List[Dict[str, str]], None],):
     if msrp is None: msrp = ''
     if gtin is None: gtin = ''
     if length is None: length = ''
@@ -33,7 +34,7 @@ def create_product_xml_element(
     brand = escape_special_characters(brand)
     model = escape_special_characters(model)
     description = escape_special_characters(description)
-    return f'''<Product><modelSku>{sku}</modelSku><modelName>{model}</modelName><modelYear>{year}</modelYear><modelDescription><![CDATA[{description}]]></modelDescription><gender>{get_gender(genders=genders)}</gender><Brand><name>{brand}</name></Brand><Specs>{create_specs_xml_element(spec_items=spec_items)}</Specs><Categories><Category><ID>0</ID></Category></Categories><ModelImages>{create_images_xml_element(images=images)}</ModelImages><VariationCombinations><VariationCombination><mpn/><gtin1>{gtin}</gtin1><msrp>{msrp}</msrp><length>{length}</length><width>{width}</width><height>{height}</height><weight>{weight}</weight></VariationCombination></VariationCombinations><bbb><DefaultImage>{default_image}</DefaultImage></bbb></Product>'''
+    return f'''<Product><modelSku>{sku}</modelSku><modelName>{model}</modelName><modelYear>{year}</modelYear><modelDescription><![CDATA[{description}]]></modelDescription><gender>{get_gender(genders=genders)}</gender><Brand><name>{brand}</name></Brand><Specs>{create_specs_xml_element(spec_items=spec_items)}</Specs><Categories>{create_categories_xml_element(categories=categories)}</Categories><ModelImages>{create_images_xml_element(images=images)}</ModelImages><VariationCombinations><VariationCombination><mpn/><gtin1>{gtin}</gtin1><msrp>{msrp}</msrp><length>{length}</length><width>{width}</width><height>{height}</height><weight>{weight}</weight></VariationCombination></VariationCombinations><bbb><DefaultImage>{default_image}</DefaultImage></bbb></Product>'''
 
 
 def get_gender(genders: Union[List[str], None]):
@@ -52,9 +53,9 @@ def create_spec_xml_element(spec_name: str, spec_value: str):
     return f'''<Spec><name>{spec_name}</name><value>{spec_value}</value></Spec>'''
 
 
-def create_specs_xml_element(spec_items: Union[Dict[str, str], None]):
+def create_specs_xml_element(spec_items: Union[List[Dict[str, str]], None]):
     if spec_items is None: return ''
-    return ''.join([create_spec_xml_element(spec_name=key, spec_value=spec_items[key]) for key in spec_items])
+    return ''.join([create_spec_xml_element(spec_name=spec['name'], spec_value=spec['value']) for spec in spec_items])
 
 
 def create_image_xml_element(image: str, order = 0):
@@ -65,3 +66,14 @@ def create_image_xml_element(image: str, order = 0):
 def create_images_xml_element(images: Union[List[str], None]):
     if images is None: return ''
     return ''.join([create_image_xml_element(image=images[index], order=index) for index in range(len(images))])
+
+
+def create_category_xml_element(category: str):
+    category_id = 0
+    category_name = escape_special_characters(category)
+    return f'''<Category><ID>{category_id}</ID><name>{category_name}</name></Category>'''
+
+
+def create_categories_xml_element(categories: Union[List[str], None]):
+    if categories is None: return ''
+    return ''.join([create_category_xml_element(category=category) for category in categories])

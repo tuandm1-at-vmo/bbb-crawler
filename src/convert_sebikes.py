@@ -88,15 +88,14 @@ def get_trekbikes(**context):
                             'in': '$$color.k',
                         },
                     },
+                    'categories': '$details.categories',
                     'specItems': {
-                        '$arrayToObject': {
-                            '$map': {
-                                'input': '$spec',
-                                'as': 'item',
-                                'in': {
-                                    'k': '$$item.partId',
-                                    'v': '$$item.description',
-                                },
+                        '$map': {
+                            'input': '$spec',
+                            'as': 'item',
+                            'in': {
+                                'name': '$$item.partId',
+                                'value': '$$item.description',
                             },
                         },
                     },
