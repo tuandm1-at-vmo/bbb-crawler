@@ -80,11 +80,19 @@ def get_bike_details(bike_header):
                     default_images.add(trekbikes.get_bike_image_url(asset_id))
         details['defaultImages'] = list(default_images)
         if len(default_images) > 0:
-            details['defaultImage'] = list(default_images)[0]
+            default_image = None
             for image in default_images:
-                if image.lower().endswith('portrait'):
-                    details['defaultImage'] = image
+                if image.lower().endswith('primary'):
+                    default_image = image
                     break
+            if default_image is None:
+                for image in default_images:
+                    if image.lower().endswith('portrait'):
+                        default_image = image
+                        break
+            if default_image is None:
+                default_image = list(default_images)[0]
+            details['defaultImage'] = default_image
     if bike_url is not None:
         categories = [re.sub(r'-', ' ', c).title() for c in str(bike_url).split('/')[2:4]]
         details['categories'] = categories

@@ -1,5 +1,6 @@
 from airflow.decorators import dag, task
 from datetime import datetime, timedelta
+from typing import Dict, Union
 
 from constants.airflow import CONNECTION_ID, DATABASE_NAME
 import services.mongo as mongo
@@ -14,17 +15,34 @@ TARGET_YEAR_PARAM = 'target_year'
 BULK_SIZE_PARAM = 'bulk_size'
 
 
+def should_ignore_sebike(model: Union[str, None]):
+    if model is None: return True
+    if model.lower().find('frameset') >= 0: return True
+    if model.lower().find('f/s') >= 0: return True
+    return False
+
+
 def chop_sebikes_to_bulk(sebikes: list, bulk_size = 1):
-    bulks: list[str] = []
-    bulk: list[str] = []
+    bulks: list[Dict[str, Union[list[str], str, int]]] = []
+    bulk: list[tuple[str]] = []
     def commit():
-        bulks.append(se.create_xml(products=bulk))
+        bulks.append({
+            'order': len(bulks),
+            'total': len(bulk),
+            'skus': [c[0] for c in bulk],
+            'xml': se.create_xml(products=[c[1] for c in bulk]),
+        })
         bulk.clear()
     for sebike in sebikes:
-        bulk.append(se.create_product_xml_element(
-            sku=safe_get(sebike, 'sku'),
+        sku = safe_get(sebike, 'sku')
+        model = safe_get(sebike, 'model')
+        if sku is None or should_ignore_sebike(model=model):
+            print(f'DEBUG: sebike ignored [sku = {sku}, model = {model}]')
+            continue
+        xml = se.create_product_xml_element(
+            sku=sku,
             brand=safe_get(sebike, 'brand'),
-            model=safe_get(sebike, 'model'),
+            model=model,
             year=safe_get(sebike, 'year'),
             description=safe_get(sebike, 'description'),
             genders=safe_get(sebike, 'genders'),
@@ -38,7 +56,8 @@ def chop_sebikes_to_bulk(sebikes: list, bulk_size = 1):
             width=None,
             height=None,
             weight=None,
-        ))
+        )
+        bulk.append((sku, xml,))
         if len(bulk) >= bulk_size: commit()
     if len(bulk) > 0: commit()
     print(f'DEBUG: total sebikes = {len(sebikes)}, total bulks = {len(bulks)}')
@@ -59,13 +78,13 @@ def get_xml_bulks(**context):
 
 
 @task()
-def save_xml(xml: str, **context):
+def save_xml(bulk, **context):
     run_id = context['dag_run'].run_id
     db = mongo.db_from_params(**context)
     coll_name = get_context_params(TARGET_COLLECTION_PARAM, **context)
     coll = db.get_collection(coll_name)
     coll.insert({
-        'content': xml,
+        'content': bulk,
         'createdAt': datetime.now(),
         'createdBy': run_id,
     })
@@ -85,8 +104,8 @@ def save_xml(xml: str, **context):
     },
 )
 def convert_sebikes_xmls():
-    xmls = get_xml_bulks()
-    save_xml.expand(xml=xmls)
+    bulks = get_xml_bulks()
+    save_xml.expand(bulk=bulks)
 
 
 _ = convert_sebikes_xmls()
