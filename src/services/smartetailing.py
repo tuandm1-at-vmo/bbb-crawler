@@ -24,6 +24,7 @@ def create_product_xml_element(
         default_image: Union[str, None],
         categories: Union[List[str], None],
         spec_items: Union[List[Dict[str, str]], None],):
+    if sku is None: sku = ''
     if msrp is None: msrp = ''
     if gtin is None: gtin = ''
     if length is None: length = ''
