@@ -1,11 +1,11 @@
 #!/bin/bash
 
-export MONGO_USERNAME=bbb-ml-staging
-export MONGO_PASSWORD=bbbmltota200429stage
-export MONGO_HOST=dbml-202009081004.bicyclebluebook.com
+export MONGO_USERNAME=admin
+export MONGO_PASSWORD=admin
+export MONGO_HOST=mongo
 export MONGO_PORT=27017
-export MONGO_DATABASE=bbb-ml-staging
-export AIRFLOW_MONGO_CONNECTION_ID=bbb-ml-staging
+export MONGO_DATABASE=bbb-dev
+export AIRFLOW_MONGO_CONNECTION_ID=bbb-dev
 
 docker exec -it airflow_scheduler bash -c " \
     airflow connections add \
